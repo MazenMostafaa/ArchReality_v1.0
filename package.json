@@ -1,7 +1,7 @@
 {
   "name": "graduation",
   "version": "1.0.0",
-  "description": "",
+  "description": "graduation project v1.0",
   "main": "index.js",
   "type": "module",
   "engines": {

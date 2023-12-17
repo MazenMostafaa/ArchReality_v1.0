@@ -1,7 +1,6 @@
 import { dbConnection } from "../../db/connection.js"
 import { globalResponse } from "./errorHandler.js"
 import cors from 'cors'
-import { corsOptions } from "./corsPolicy.js"
 
 export const initiateApp = (app, express) => {
 
@@ -12,8 +11,7 @@ export const initiateApp = (app, express) => {
 
     // allow cors policy on your APIs
     // app.use(cors())   this means you allow all (domains or IPs) to get access.
-
-    app.use(cors(corsOptions)) // this means you allow a specific (domains or IPs) to get access.
+    app.use(cors())
 
     // parsing any requested data
     app.use(express.json())
