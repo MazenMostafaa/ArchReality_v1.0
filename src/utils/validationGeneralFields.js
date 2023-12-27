@@ -1,4 +1,6 @@
-
+import joi from 'joi'
+import { Types } from 'mongoose'
+import { systemRoles } from './systemRoles.js'
 
 // ======= custome validation for object-Id ========
 const validationObjectId = (value, helper) => {
@@ -6,4 +8,23 @@ const validationObjectId = (value, helper) => {
 }
 
 // ======= fields are used more than once ========
-export const generalFields = {}
+export const generalFields = {
+
+    Id: joi.string().custom(validationObjectId),
+
+    firstName: joi.string().min(3).max(20).regex(/^[a-zA-Z_-\s]*$/).trim()
+        .messages({ 'any.required': 'firstName is required', }),
+
+    lastName: joi.string().min(3).max(20).regex(/^[a-zA-Z_-\s]*$/).trim()
+        .messages({ 'any.required': 'lastName is required', }),
+
+    email: joi.string().email({ tlds: { allow: ['com', 'net', 'org'] } })
+        .regex(/^[a-zA-Z0-9._%+-]+@(?:gmail+\.)+(com|org|net)$/).trim(),
+
+    password: joi.string().min(5).max(15).regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{5,}$/)
+        .messages({ 'string.pattern.base': 'need more complex password combined nums & strings', }),
+
+    role: joi.string().valid(systemRoles.CLIENT, systemRoles.ADMIN, systemRoles.ENGINEER)
+
+
+}
