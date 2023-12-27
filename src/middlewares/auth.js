@@ -1,7 +1,8 @@
 import { verifyToken, generateToken } from "../utils/tokenFunctions.js"
+import { userModel } from '../../db/models/userModel.js'
 
 export const isAuth = (roles) => {
-    return (req, res, next) => {
+    return async (req, res, next) => {
 
         const { authorization } = req.headers
 
@@ -20,52 +21,52 @@ export const isAuth = (roles) => {
         try {
             const decodedData = verifyToken({ token: splittedToken, signature: process.env.LOGIN_SIGN })
 
-            // const findUser = await userModel.findById(
-            //     decodedData._id,
-            //     'email userName role')
-            // if (!findUser) {
-            //     return res.status(400).json({ message: 'Please SignUp' })
-            // }
-            /// ============================= Authorization ===================
-            // if (!roles.includes(findUser.role)) {
-            //     return next(
-            //         new Error('Unauthorized to access this API', { cause: 401 }),
-            //     )
-            // }
+            const findUser = await userModel.findById(
+                decodedData._id,
+                '_id email role token')
+            if (!findUser) {
+                return res.status(400).json({ message: 'Please Register first' })
+            }
+            // / ============================= Authorization ===================
+            if (!roles.includes(findUser.role)) {
+                return next(
+                    new Error('Unauthorized to access this API', { cause: 401 }),
+                )
+            }
 
-            req.authUser = authorizedUser
+            req.authUser = findUser
             next()
         } catch (error) {
 
             if (error == 'TokenExpiredError: jwt expired') {
 
-                // const user = await userModel.findOne({ token: splittedToken })
+                const user = await userModel.findOne({ token: splittedToken })
 
-                // if (!user) {
-                //     return res.status(400).json({ Message: "In valid user related to this token" })
-                // }
+                if (!user) {
+                    return res.status(400).json({ Message: "In valid user related to this token" })
+                }
 
                 // NOTE : this generation must looks like the token is generated in Login API
-                // const userToken = generateToken({
-                //     payload: { _id: user._id, role: user.role, email: user.email },
-                //     signature: process.env.SIGN_IN_TOKEN_SECRET,
-                //     expiresIn: "2d",
-                // })
+                const userToken = generateToken({
+                    payload: { _id: user._id, role: user.role, email: user.email },
+                    signature: process.env.LOGIN_SIGN,
+                    expiresIn: "2d",
+                })
 
-                // if (!userToken) {
-                //     return next(
-                //         new Error('token generation fail try again', {
-                //             cause: 400,
-                //         }),
-                //     )
-                // }
+                if (!userToken) {
+                    return next(
+                        new Error('token generation fail try again', {
+                            cause: 400,
+                        }),
+                    )
+                }
 
-                // await userModel.findOneAndUpdate(
-                //     { token: splittedToken },
-                //     { token: userToken },
-                //     { new: true }
-                // )
-                // return res.status(201).json({ Message: "Token is refreshed", newToken: userToken })
+                await userModel.findOneAndUpdate(
+                    { token: splittedToken },
+                    { token: userToken },
+                    { new: true }
+                )
+                return res.status(201).json({ Message: "Token is refreshed", newToken: userToken })
             }
             return next(new Error("In-valid Token", { cause: 400 }))
         }

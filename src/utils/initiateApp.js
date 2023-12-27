@@ -1,6 +1,8 @@
 import { dbConnection } from "../../db/connection.js"
 import { globalResponse } from "./errorHandler.js"
 import cors from 'cors'
+import * as allRouters from '../modules/index.routes.js'
+import { checkConfirmedUser } from './cronJobs.js'
 
 export const initiateApp = (app, express) => {
 
@@ -21,9 +23,13 @@ export const initiateApp = (app, express) => {
 
 
     //  Section Requests On RESTful APIs
+    app.use('/api/auth', allRouters.authRouters)
 
     // Global response for any (expected) fail case 
     app.use(globalResponse)
+
+    // Cron job for deleting unconfirmed users from DB. runs every 2 days
+    checkConfirmedUser()
 
     // router in case there's no routers match
     app.all('*', (req, res) => { res.status(404).json({ Message: "404 Not fount URL" }) })
