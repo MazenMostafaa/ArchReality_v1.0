@@ -65,7 +65,8 @@ export const register = async (req, res, next) => {
 
     res.status(201)
         .json({
-            message: "Please direct user to confirm his/her account to continue registeration,confirmation will expire in 2 day"
+            message: "Please direct user to confirm his/her inbox to continue registeration,confirmation will expire in 2 day",
+            cofirmationEmail_API: conirmationlink
         })
 }
 
@@ -175,7 +176,10 @@ export const forgetPassword = async (req, res, next) => {
         return next(
             new Error('changing password process is failed ,try to fetch an API again', { cause: 400 }))
     }
-    res.status(200).json({ message: 'OTP verification code is sent check your email' })
+    res.status(200).json({
+        message: 'OTP verification code is sent check your email',
+        checkOTP_API: checkOTP
+    })
 }
 
 export const checkOTP = async (req, res, next) => {
