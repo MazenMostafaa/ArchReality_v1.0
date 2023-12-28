@@ -9,9 +9,7 @@ export const registerSchema = {
             email: generalFields.email.required(),
             password: generalFields.password.required(),
             cPassword: joi.valid(joi.ref('password')).required(),
-
-
-            role: generalFields.role.optional()
+            role: generalFields.clientRole.optional()
         }).required()
 }
 

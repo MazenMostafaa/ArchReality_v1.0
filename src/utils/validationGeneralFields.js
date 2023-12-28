@@ -24,7 +24,8 @@ export const generalFields = {
     password: joi.string().min(5).max(15).regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{5,}$/)
         .messages({ 'string.pattern.base': 'need more complex password combined nums & strings', }),
 
-    role: joi.string().valid(systemRoles.CLIENT, systemRoles.ADMIN, systemRoles.ENGINEER)
+    clientRole: joi.string().valid(systemRoles.CLIENT),
+    adminRoles: joi.string().valid(systemRoles.ADMIN, systemRoles.ENGINEER)
 
 
 }
