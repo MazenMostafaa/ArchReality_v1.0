@@ -29,7 +29,7 @@ const userSchema = new Schema({
     },
     role: {
         type: String,
-        enum: [systemRoles.CLIENT, systemRoles.ENGINEER, systemRoles.ADMIN],
+        enum: [systemRoles.CLIENT],
         default: systemRoles.CLIENT
     },
     provider: {

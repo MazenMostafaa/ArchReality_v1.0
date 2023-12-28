@@ -19,7 +19,7 @@ export const initiateApp = (app, express) => {
     app.use(express.json())
 
     // default router
-    app.get('/', (req, res) => res.status(200).json('Hello from graduation folder!'))
+    app.get('/', (req, res) => res.status(200).json('Hello from graduation project!'))
 
 
     //  Section Requests On RESTful APIs

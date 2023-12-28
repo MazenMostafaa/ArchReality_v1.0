@@ -11,15 +11,15 @@ router.get('/confirmEmail/:token', asyncHandler(ac.confirmEmail))
 
 router.post('/login', validationFunction(validator.loginSchema), asyncHandler(ac.login))
 
-// router.post('/googleAuth',
-//     validationFunction(validator.loginWithGoogleSchema),
-//     asyncHandler(ac.loginWithGmail))
+router.post('/google', asyncHandler(ac.loginWithGmail))
 
 router.post('/forget',
     validationFunction(validator.forgetPasswordSchema),
     asyncHandler(ac.forgetPassword))
 
-router.post('/checkOTP/:token', validationFunction(validator.checkOTPSchema), asyncHandler(ac.checkOTP))
+router.post('/checkOTP/:token',
+    validationFunction(validator.checkOTPSchema),
+    asyncHandler(ac.checkOTP))
 
 
 export default router

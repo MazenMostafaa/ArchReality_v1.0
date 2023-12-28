@@ -2,9 +2,9 @@ import { userModel } from '../../../db/models/userModel.js'
 import { generateToken, verifyToken } from '../../utils/tokenFunctions.js'
 import { sendEmailService } from '../../services/mailService.js'
 import pkg from 'bcrypt'
-// import { OAuth2Client } from 'google-auth-library'
+import { OAuth2Client } from 'google-auth-library'
 import { providers, systemRoles } from '../../utils/systemRoles.js'
-import { customAlphabet } from 'nanoid'
+import { customAlphabet, nanoid } from 'nanoid'
 import { OTPemailTemplate } from '../../utils/OTPemailTemplate.js'
 
 
@@ -129,6 +129,78 @@ export const login = async (req, res, next) => {
         userName: `${logedInUser.firstName} ${logedInUser.lastName}`,
         userRole: logedInUser.role,
         userToken: logedInUser.token
+    })
+}
+
+export const loginWithGmail = async (req, res, next) => {
+    const client = new OAuth2Client()
+    const { idToken } = req.body
+    async function verify() {
+        const ticket = await client.verifyIdToken({
+            idToken,
+            audience: process.env.CLIENT_ID,
+        })
+        const payload = ticket.getPayload()
+        return payload
+    }
+    const { email_verified, email, given_name, family_name, name } = await verify()
+    if (!email_verified) {
+        return next(new Error('invalid email', { cause: 400 }))
+    }
+    const user = await userModel.findOne({ email, provider: providers.GOOGLE })
+    //login
+    if (user) {
+        const token = generateToken({
+            payload: {
+                _id: user._id,
+                email: user.email,
+                role: user.role
+            },
+            signature: process.env.LOGIN_SIGN,
+            expiresIn: '5d'
+        })
+
+        const userUpdated = await userModel.findOneAndUpdate(
+            { email },
+            {
+                token,
+            },
+            {
+                new: true,
+            },
+        )
+
+        res.status(200).json({
+            message: 'user loged in',
+            userName: name, userRole: userUpdated.role, userToken: token
+        })
+    }
+
+    // signUp
+    const userObject = {
+        firstName: given_name,
+        lastName: family_name,
+        email,
+        password: pkg.hashSync(nanoid(6), +process.env.SALT_ROUNDS),
+        provider: providers.GOOGLE,
+        isConfirmed: true,
+        role: systemRoles.CLIENT,
+    }
+    const newUser = await userModel.create(userObject)
+    const token = generateToken({
+        payload: {
+            _id: newUser._id,
+            email: newUser.email,
+            role: newUser.role
+        },
+        signature: process.env.LOGIN_SIGN,
+        expiresIn: '5d'
+    })
+    newUser.token = token
+    await newUser.save()
+    res.status(200).json({
+        message: 'Verified and user loged in',
+        userName: name, userRole: newUser.role, userToken: token
     })
 }
 
