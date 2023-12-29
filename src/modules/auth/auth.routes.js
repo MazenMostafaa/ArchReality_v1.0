@@ -17,9 +17,13 @@ router.post('/forget',
     validationFunction(validator.forgetPasswordSchema),
     asyncHandler(ac.forgetPassword))
 
-router.post('/checkOTP/:token',
+router.post('/checkOTP',
     validationFunction(validator.checkOTPSchema),
     asyncHandler(ac.checkOTP))
+
+router.post('/resetPass',
+    validationFunction(validator.resetPasswordSchema),
+    asyncHandler(ac.resetPassword))
 
 
 export default router

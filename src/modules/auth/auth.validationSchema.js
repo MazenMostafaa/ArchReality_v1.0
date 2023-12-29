@@ -32,6 +32,14 @@ export const checkOTPSchema = {
     body: joi
         .object({
             otp: joi.number().min(4).required(),
+            email: generalFields.email.required()
+        }).required()
+}
+
+export const resetPasswordSchema = {
+    body: joi
+        .object({
+            email: generalFields.email.required(),
             password: generalFields.password.required(),
             cPassword: joi.valid(joi.ref('password')).required(),
         }).required()
