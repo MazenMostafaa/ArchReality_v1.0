@@ -304,3 +304,23 @@ export const resetPassword = async (req, res, next) => {
     res.status(200).json({ message: 'password has been updated successfully' })
 }
 
+export const logout = async (req, res, next) => {
+
+    const { email } = req.body
+
+    const userCheck = await userModel.findOne({ email })
+
+    if (!userCheck) {
+        return next(
+            new Error('in-valid email', { cause: 400 })
+        )
+    }
+
+    const userLogedOut = await userModel.findOneAndUpdate({ email }, { token: "" })
+    if (!userLogedOut) {
+        return next(
+            new Error('fail to update the user', { cause: 400 })
+        )
+    }
+    res.status(200).json({ Message: " user logged out" })
+}

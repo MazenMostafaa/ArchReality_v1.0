@@ -21,9 +21,12 @@ router.post('/checkOTP',
     validationFunction(validator.checkOTPSchema),
     asyncHandler(ac.checkOTP))
 
-router.post('/resetPass',
+router.put('/resetPass',
     validationFunction(validator.resetPasswordSchema),
     asyncHandler(ac.resetPassword))
 
+router.post('/logout',
+    validationFunction(validator.LogOutSchema),
+    asyncHandler(ac.logout))
 
 export default router

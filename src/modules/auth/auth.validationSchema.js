@@ -44,3 +44,11 @@ export const resetPasswordSchema = {
             cPassword: joi.valid(joi.ref('password')).required(),
         }).required()
 }
+
+export const LogOutSchema = {
+    body: joi
+        .object({
+            email: generalFields.email.required(),
+        })
+        .required().options({ presence: 'required' }),
+}
