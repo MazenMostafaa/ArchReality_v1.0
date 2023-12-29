@@ -1,4 +1,4 @@
-export const OTPemailTemplate = ({ link, otp }) => {
+export const OTPemailTemplate = ({ otp = '' }) => {
     return `<!DOCTYPE html>
     <html lang="en">
     <head>
@@ -31,8 +31,7 @@ export const OTPemailTemplate = ({ link, otp }) => {
     <div class="container">
     <div class="content">
     <h1>Welcome to Arch_Reality!</h1>
-    <p>To reset your password, please click the link below to continue and enter the verification code where you go:</p>
-    <p><a class="link" href="${link}">Reset my password now</a></p>
+    <p>To reset your password, get your OTP verification code and don't share it with others. enter the verification code where you go:</p>
     <p>Verification code: <span class="verification-code">${otp}</span></p>
     <p>This code is valid for [60] minutes.</p>
     <p>If you have any questions, please don't hesitate to contact us.</p>

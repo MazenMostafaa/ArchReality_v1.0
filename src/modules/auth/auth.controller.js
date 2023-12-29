@@ -214,21 +214,21 @@ export const forgetPassword = async (req, res, next) => {
     const randomOTP = customAlphabet('1234567890', 4)
     const otp = randomOTP()
 
-    const token = generateToken({
-        payload: {
-            email,
-            otp,
-        },
-        signature: process.env.FORGET_PASS_TOKEN,
-        expiresIn: '1h',
-    })
+    // const token = generateToken({
+    //     payload: {
+    //         email,
+    //         otp,
+    //     },
+    //     signature: process.env.FORGET_PASS_TOKEN,
+    //     expiresIn: '1h',
+    // })
 
-    const checkOTP = `${req.protocol}://${req.headers.host}/api/auth/checkOTP/${token}`
+    // const checkOTP = `${req.protocol}://${req.headers.host}/api/auth/checkOTP/${token}`
 
     const isEmailSent = sendEmailService({
         to: email,
         subject: 'OTP verification',
-        message: OTPemailTemplate({ link: checkOTP, otp }),
+        message: OTPemailTemplate({ otp }),
 
     })
     if (!isEmailSent) {
@@ -255,19 +255,9 @@ export const forgetPassword = async (req, res, next) => {
 }
 
 export const checkOTP = async (req, res, next) => {
-    const { token } = req.params
-    const { otp, password, cPassword } = req.body
+    const { otp, email } = req.body
 
-    const decoded = verifyToken({ token, signature: process.env.FORGET_PASS_TOKEN })
-
-    if (!decoded) {
-        return next(new Error('Too late to reset, token is expired. press forgot password again', { cause: 400 }))
-    }
-    const user = await userModel.findOne({
-        email: decoded?.email,
-        otp: decoded.otp,
-    })
-
+    const user = await userModel.findOne({ email, otp })
     if (!user) {
         return next(
             new Error('In-valid user', { cause: 400 })
@@ -277,6 +267,19 @@ export const checkOTP = async (req, res, next) => {
     if (user.otp !== otp) {
         return next(
             new Error('In-valid OTP code', { cause: 400 })
+        )
+    }
+
+    res.status(200).json({ message: 'OTP is correct' })
+}
+
+export const resetPassword = async (req, res, next) => {
+    const { email, password, cPassword } = req.body
+
+    const user = await userModel.findOne({ email })
+    if (!user) {
+        return next(
+            new Error('In-valid user', { cause: 400 })
         )
     }
 

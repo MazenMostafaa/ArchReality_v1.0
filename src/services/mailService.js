@@ -6,8 +6,8 @@ export async function sendEmailService({
     //   ====== Config Transporter
     const transporter = nodemailer.createTransport({
         host: 'localhost', // stmp.gmail.com
-        port: 587, // 587 , 465
-        secure: false, // false , true
+        port: 465, // 587 , 465
+        secure: true, // false , true
         service: 'gmail', // optional
         auth: {
             // credentials
