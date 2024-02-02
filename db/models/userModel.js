@@ -27,6 +27,10 @@ const userSchema = new Schema({
         required: true,
         minlength: 5,
     },
+    profilePic: {
+        secure_url: String,
+        public_id: String,
+    },
     role: {
         type: String,
         enum: [systemRoles.CLIENT],
