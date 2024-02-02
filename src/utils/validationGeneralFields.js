@@ -24,8 +24,20 @@ export const generalFields = {
     password: joi.string().min(5).max(15).regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{5,}$/)
         .messages({ 'string.pattern.base': 'need more complex password combined nums & strings', }),
 
-    clientRole: joi.string().valid(systemRoles.CLIENT),
-    adminRoles: joi.string().valid(systemRoles.ADMIN, systemRoles.ENGINEER)
 
+    clientRole: joi.string().valid(systemRoles.CLIENT),
+    adminRoles: joi.string().valid(systemRoles.ADMIN, systemRoles.ENGINEER),
+
+    file: joi.object({
+
+        size: joi.number().positive().required(),
+        path: joi.string().required(),
+        filename: joi.string().required(),
+        destination: joi.string().required(),
+        mimetype: joi.string().required(),
+        encoding: joi.string().required(),
+        originalname: joi.string().required(),
+        fieldname: joi.string().required()
+    })
 
 }

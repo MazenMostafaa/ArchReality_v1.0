@@ -24,7 +24,7 @@ export const initiateApp = (app, express) => {
 
     //  Section Requests On RESTful APIs
     app.use('/api/auth', allRouters.authRouters)
-
+    app.use('/api/client', allRouters.clientRouters)
     // Global response for any (expected) fail case 
     app.use(globalResponse)
 
