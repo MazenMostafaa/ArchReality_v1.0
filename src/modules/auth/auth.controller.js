@@ -124,9 +124,25 @@ export const login = async (req, res, next) => {
     )
 
 
+    if (logedInUser.profilePic.secure_url !== undefined) {
+
+        const { secure_url } = logedInUser.profilePic
+        return res.status(200).json({
+            Message: "User loged in",
+            firstName: logedInUser.firstName,
+            lastName: logedInUser.lastName,
+            picture: secure_url,
+            email: logedInUser.email,
+            userRole: logedInUser.role,
+            userToken: logedInUser.token
+        })
+    }
+
     res.status(200).json({
         Message: "User loged in",
-        userName: `${logedInUser.firstName} ${logedInUser.lastName}`,
+        firstName: logedInUser.firstName,
+        lastName: logedInUser.lastName,
+        email: logedInUser.email,
         userRole: logedInUser.role,
         userToken: logedInUser.token
     })
