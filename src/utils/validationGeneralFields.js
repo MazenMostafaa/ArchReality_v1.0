@@ -25,11 +25,9 @@ export const generalFields = {
         .messages({ 'string.pattern.base': 'need more complex password combined nums & strings', }),
 
 
-    clientRole: joi.string().valid(systemRoles.CLIENT),
-    adminRoles: joi.string().valid(systemRoles.ADMIN, systemRoles.ENGINEER),
+    roles: joi.string().valid(systemRoles.CLIENT, systemRoles.ADMIN, systemRoles.ENGINEER),
 
     file: joi.object({
-
         size: joi.number().positive().required(),
         path: joi.string().required(),
         filename: joi.string().required(),
@@ -38,6 +36,17 @@ export const generalFields = {
         encoding: joi.string().required(),
         originalname: joi.string().required(),
         fieldname: joi.string().required()
-    })
+    }),
+
+    files: joi.array().items(joi.object({
+        size: joi.number().positive().required(),
+        path: joi.string().required(),
+        filename: joi.string().required(),
+        destination: joi.string().required(),
+        mimetype: joi.string().required(),
+        encoding: joi.string().required(),
+        originalname: joi.string().required(),
+        fieldname: joi.string().required()
+    })).messages({ "any.required": "file is required" })
 
 }
