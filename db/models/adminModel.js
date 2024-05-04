@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
-import { systemRoles, providers } from '../../src/utils/systemRoles.js'
+import { systemRoles } from '../../src/utils/systemRoles.js'
 
-const userSchema = new Schema({
+const adminSchema = new Schema({
     firstName: {
         type: String,
         // required: true,
@@ -33,14 +33,8 @@ const userSchema = new Schema({
     },
     role: {
         type: String,
-        enum: [systemRoles.CLIENT, systemRoles.ENGINEER],
-        default: systemRoles.CLIENT
-    },
-    provider: {
-        type: String,
-        enum: [providers.SYSTEM, providers.GOOGLE, providers.FACEBOOK],
-        required: true,
-        default: providers.SYSTEM
+        enum: [systemRoles.ADMIN],
+        default: systemRoles.ADMIN
     },
     token: {
         type: String,
@@ -56,4 +50,4 @@ const userSchema = new Schema({
     timestamps: true
 })
 
-export const userModel = mongoose.model('user', userSchema)
+export const adminModel = mongoose.model('admin', adminSchema)
