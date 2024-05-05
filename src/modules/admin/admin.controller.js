@@ -368,7 +368,7 @@ export const listAccounts = async (req, res, next) => {
             .select()
     }
 
-    if (role == "engineer") {
+    if (role == "engineer" || "client") {
         ApiFeaturesInstance = new ApiFeatures
             (userModel.find({ role: { $regex: role, $options: 'i' } }), req.query)
             .pagination()
