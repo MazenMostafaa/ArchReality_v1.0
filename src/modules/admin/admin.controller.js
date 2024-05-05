@@ -360,10 +360,20 @@ export const deleteAcc = async (req, res, next) => {
 export const listAccounts = async (req, res, next) => {
     const { role } = req.query
 
-    const ApiFeaturesInstance = new ApiFeatures
-        (userModel.find({ role: { $regex: role, $options: 'i' } }), req.query)
-        .pagination()
-        .select()
+    let ApiFeaturesInstance
+    if (role == "admin") {
+        ApiFeaturesInstance = new ApiFeatures
+            (adminModel.find({ role: { $regex: role, $options: 'i' } }), req.query)
+            .pagination()
+            .select()
+    }
+
+    if (role == "engineer") {
+        ApiFeaturesInstance = new ApiFeatures
+            (userModel.find({ role: { $regex: role, $options: 'i' } }), req.query)
+            .pagination()
+            .select()
+    }
     const accounts = await ApiFeaturesInstance.mongooseQuery
 
     res.status(200).json({ message: 'Done', accounts })
