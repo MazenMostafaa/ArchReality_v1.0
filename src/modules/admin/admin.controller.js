@@ -86,7 +86,7 @@ export const createAdmin = async (req, res, next) => {
         // generate email
 
         // Generate Confirmation Link
-        const conirmationlink = `${req.protocol}://${req.headers.host}/api/admin/confirmEmail/${token}`
+        const conirmationlink = `${req.protocol}://${req.headers.host}/api/dashboard/confirmEmail/${token}`
         const isEmailSent = sendEmailService({
             to: email,
             subject: 'Confirmation Email',
