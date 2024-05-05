@@ -343,16 +343,19 @@ export const deleteAcc = async (req, res, next) => {
         return next(new Error('could not find this account', { cause: 400 }))
     }
 
+    //=========== Delete from cloudinary ==============
+    if (idCheck.profilePic.secure_url !== undefined) {
+
+        await cloudinary.api.delete_resources_by_prefix(
+            `${process.env.USERS_PROFILE_PIC_FOLDER}/profilePic/${idCheck._id}`,
+        )
+        await cloudinary.api.delete_folder(
+            `${process.env.USERS_PROFILE_PIC_FOLDER}/profilePic/${idCheck._id}`,
+        )
+    }
     //=========== Delete from DB ==============
     await userModel.findByIdAndDelete(id)
 
-    //=========== Delete from cloudinary ==============
-    await cloudinary.api.delete_resources_by_prefix(
-        `${process.env.USERS_PROFILE_PIC_FOLDER}/profilePic/${idCheck._id}`,
-    )
-    await cloudinary.api.delete_folder(
-        `${process.env.USERS_PROFILE_PIC_FOLDER}/profilePic/${idCheck._id}`,
-    )
 
     res.status(200).json({ messsage: 'Deleted Done' })
 }
