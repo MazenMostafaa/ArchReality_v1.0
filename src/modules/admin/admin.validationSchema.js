@@ -6,15 +6,15 @@ export const createSchema = {
     body: joi
         .object({
             email: generalFields.email.required(),
-            password: generalFields.password.required(),
+            password: joi.string().min(5).max(15).required(),
             role: joi.string().allow(systemRoles.ADMIN, systemRoles.ENGINEER).required()
         }).required()
 }
 export const loginSchema = {
     body: joi
         .object({
-            email: generalFields.email.optional(),
-            password: generalFields.password.required(),
+            email: generalFields.email.required(),
+            password: joi.string().min(5).max(15).required(),
         }).required()
 }
 
