@@ -406,10 +406,6 @@ export const addProj = async (req, res, next) => {
         }
     }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> b007dd40e02efe8bf2da092f06dd25af21907fdd
     const customId = nanoid()
     let Images = []
     let ARmodel
@@ -455,7 +451,6 @@ export const addProj = async (req, res, next) => {
 
     res.status(200).json({ message: 'Done', project })
 }
-<<<<<<< HEAD
 
 export const updateProj = async (req, res, next) => {
 
@@ -610,5 +605,3 @@ export const listProj = async (req, res, next) => {
 
     res.status(200).json({ message: 'Done', projects })
 }
-=======
->>>>>>> b007dd40e02efe8bf2da092f06dd25af21907fdd
