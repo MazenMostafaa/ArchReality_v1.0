@@ -406,9 +406,6 @@ export const addProj = async (req, res, next) => {
         }
     }
 
-    // if (Object.keys(req.files)) {
-    //     return next(new Error('please upload pictures', { cause: 400 }))
-    // }
     const customId = nanoid()
     let Images = []
     let ARmodel
@@ -435,15 +432,6 @@ export const addProj = async (req, res, next) => {
                 )
                 ARmodel = { secure_url, public_id }
             }
-            // for (const key of req.files[file]) {
-
-            //     const { secure_url, public_id } = await cloudinary.uploader.upload(key.path,
-            //         {
-            //             folder: `${process.env.PROPERTY_PICS_FOLDER}/${customId}`,
-            //         }
-            //     )
-            //     ARmodel = { secure_url, public_id }
-            // }
         }
     }
 
@@ -462,4 +450,158 @@ export const addProj = async (req, res, next) => {
     const project = await propertyModel.create(propertObject)
 
     res.status(200).json({ message: 'Done', project })
+}
+
+export const updateProj = async (req, res, next) => {
+
+    const { _id } = req.authAdmin
+
+    const { title, desc, propType } = req.body
+
+    const { projectId, assignedTo } = req.query
+
+    const isProjectExist = await propertyModel.findById(projectId).lean()
+
+    if (!isProjectExist) {
+        return next(new Error("invalid project Id", { cause: 400 }))
+    }
+
+    if (_id.toString() !== isProjectExist.createdBy.toString()) {
+        return next(new Error("Un-authorized admin to access", { cause: 400 }))
+    }
+
+    const projectCheck = await propertyModel.hydrate(isProjectExist)
+
+    if (title) projectCheck.title = title
+    if (desc) projectCheck.desc = desc
+    if (propType) projectCheck.propType = propType
+    if (assignedTo) {
+        const engineerCheck = await userModel.findById(assignedTo)
+        if (!engineerCheck || engineerCheck.role !== systemRoles.ENGINEER) {
+            return next(new Error("Could not find this engineer", { cause: 400 }))
+        }
+        projectCheck.assignedTo = assignedTo
+    }
+
+    for (const file in req.files) {
+        let imagesCounter = 0
+        let Images = []
+        let newImages = []
+        if (file == "Images") {
+            for (let index = 0; index < req.files[file].length; index++) {
+                const { path } = req.files[file][index]
+                const { secure_url, public_id } = await cloudinary.uploader.upload(path,
+                    {
+                        folder: `${process.env.PROPERTY_PICS_FOLDER}/${projectCheck.customId}`
+                    }
+                )
+                newImages.push({ secure_url, public_id })
+                imagesCounter += 1
+            }
+            if (imagesCounter > projectCheck.Images.length) {
+                for (let index = 0; index <= imagesCounter; index++) {
+                    if (index < projectCheck.Images.length) {
+                        if (projectCheck.Images[index].public_id !== undefined) {
+                            await cloudinary.uploader.destroy(projectCheck.Images[index].public_id)
+                            projectCheck.Images.splice(projectCheck.Images[index], 1)
+                        }
+                    }
+                }
+            }
+            for (let index = 0; index < projectCheck.Images.length; index++) {
+                if (projectCheck.Images[index].public_id !== undefined) {
+                    await cloudinary.uploader.destroy(projectCheck.Images[index].public_id)
+                    projectCheck.Images.splice(projectCheck.Images[index], 1)
+                    imagesCounter -= 1
+                }
+                if (imagesCounter == -1) {
+                    break;
+                }
+            }
+            Images = [...projectCheck.Images, ...newImages]
+            projectCheck.Images = Images
+        }
+
+        let profileFlag = false
+        let ARmodel
+        if (file == "ARmodel") {
+            for (let index = 0; index < req.files[file].length; index++) {
+                const { path } = req.files[file][index]
+                const { secure_url, public_id } = await cloudinary.uploader.upload(path,
+                    {
+                        folder: `${process.env.PROPERTY_PICS_FOLDER}/${projectCheck.customId}`
+                    }
+                )
+                if (projectCheck.ARmodel.public_id !== undefined) {
+
+                    await cloudinary.uploader.destroy(projectCheck.ARmodel.public_id)
+                }
+                ARmodel = { secure_url, public_id }
+                profileFlag = true
+            }
+            if (profileFlag) {
+                projectCheck.ARmodel = ARmodel
+            }
+        }
+    }
+
+    const updatedProject = await projectCheck.save()
+    if (!updatedProject) {
+        return next(new Error("Fail to update", { cause: 400 }))
+    }
+    res.status(200).json({ message: 'project has been Updated successfully', updatedProject })
+}
+
+export const deleteProj = async (req, res, next) => {
+    const { _id } = req.authAdmin
+    const { projectId } = req.params
+
+    const isProjectExist = await propertyModel.findById(projectId)
+
+    if (!isProjectExist) {
+        return next(new Error("invalid project Id", { cause: 400 }))
+    }
+
+    if (_id.toString() !== isProjectExist.createdBy.toString()) {
+        return next(new Error("Un-authorized admin to access", { cause: 400 }))
+    }
+
+    //=========== Delete from cloudinary ==============
+    if (isProjectExist.Images.length
+        || isProjectExist.ARmodel.secure_url !== undefined) {
+
+        await cloudinary.api.delete_resources_by_prefix(
+            `${process.env.PROPERTY_PICS_FOLDER}/${isProjectExist.customId}`,
+        )
+        await cloudinary.api.delete_folder(
+            `${process.env.PROPERTY_PICS_FOLDER}/${isProjectExist.customId}`,
+        )
+    }
+    //=========== Delete from DB ==============
+    await propertyModel.findByIdAndDelete(projectId)
+
+
+    res.status(200).json({ messsage: 'Deleted Done' })
+}
+
+export const listProj = async (req, res, next) => {
+    const { propType } = req.query
+
+    let ApiFeaturesInstance
+    if (propType == "interior") {
+        ApiFeaturesInstance = new ApiFeatures
+            (propertyModel.find({ propType: { $regex: propType, $options: 'i' } }), req.query)
+            .pagination()
+            .select()
+    }
+
+    if (propType == "exterior") {
+        ApiFeaturesInstance = new ApiFeatures
+            (propertyModel.find({ propType: { $regex: propType, $options: 'i' } }), req.query)
+            .pagination()
+            .select()
+    }
+    const projects = await ApiFeaturesInstance.mongooseQuery
+
+    res.status(200).json({ message: 'Done', projects })
 }

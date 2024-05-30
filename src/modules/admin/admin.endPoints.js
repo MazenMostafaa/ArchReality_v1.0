@@ -5,4 +5,5 @@ export const adminApisRole = {
     DELETE: [systemRoles.ADMIN],
     UPDATE: [systemRoles.ADMIN],
     LIST: [systemRoles.ADMIN],
+    LISTPROJECTS: [systemRoles.ADMIN, systemRoles.CLIENT],
 }

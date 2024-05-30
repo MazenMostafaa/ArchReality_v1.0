@@ -10,6 +10,7 @@ import { allowedExtensions } from '../../utils/multerAllowedExtensions.js'
 
 const router = Router()
 
+//              ==========> Admin Auth Routes <============
 router.post('/mainAccount', asyncHandler(Ac.mainAccount))
 
 router.post('/createAccount',
@@ -33,7 +34,7 @@ router.delete('/deleteAcc/:id',
     adminAuth(adminApisRole.DELETE),
     asyncHandler(Ac.deleteAcc))
 
-// ==> Projects Management Routes
+//              ==========> Projects Management Routes <============
 
 router.post('/addProj',
     multerCloudFunction(allowedExtensions.Image)
@@ -44,4 +45,21 @@ router.post('/addProj',
     adminAuth(adminApisRole.CREATE),
     validationFunction(validator.AddProjSchema),
     asyncHandler(Ac.addProj))
+
+router.put('/updateProj',
+    adminAuth(adminApisRole.UPDATE),
+    multerCloudFunction(allowedExtensions.Image)
+        .fields([
+            { name: 'Images' },
+            { name: 'ARmodel', maxCount: 1 }
+        ]),
+    validationFunction(validator.updateProjSchema),
+    asyncHandler(Ac.updateProj))
+
+router.delete('/deleteProj/:projectId',
+    adminAuth(adminApisRole.DELETE),
+    asyncHandler(Ac.deleteProj))
+
+router.get('/listProj', adminAuth(adminApisRole.LISTPROJECTS), asyncHandler(Ac.listProj))
+
 export default router

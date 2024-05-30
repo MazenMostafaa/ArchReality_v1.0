@@ -48,3 +48,19 @@ export const AddProjSchema = {
         assignedTo: generalFields.Id.optional(),
     }).required()
 }
+
+export const updateProjSchema = {
+    body: joi
+        .object({
+            title: joi.string().min(5).max(55).lowercase().optional(),
+            desc: joi.string().max(250).optional(),
+            propType: joi.string().allow('exterior', 'interior').optional(),
+        }).optional(),
+
+    // files: generalFields.files.required(),
+
+    query: joi.object({
+        projectId: generalFields.Id.required(),
+        assignedTo: generalFields.Id.optional(),
+    }).required()
+}
