@@ -406,6 +406,7 @@ export const addProj = async (req, res, next) => {
         }
     }
 
+<<<<<<< HEAD
 
 
 
@@ -414,6 +415,9 @@ export const addProj = async (req, res, next) => {
 
 
 
+=======
+    
+>>>>>>> bc89b0a9b075aa43d759184502062a2b1a4fdd21
     const customId = nanoid()
     let Images = []
     let ARmodel
