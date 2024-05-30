@@ -406,9 +406,7 @@ export const addProj = async (req, res, next) => {
         }
     }
 
-    // if (Object.keys(req.files)) {
-    //     return next(new Error('please upload pictures', { cause: 400 }))
-    // }
+  
     const customId = nanoid()
     let Images = []
     let ARmodel
