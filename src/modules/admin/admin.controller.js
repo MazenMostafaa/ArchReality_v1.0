@@ -408,7 +408,7 @@ export const addProj = async (req, res, next) => {
 
 <<<<<<< HEAD
 =======
-  
+
 >>>>>>> b007dd40e02efe8bf2da092f06dd25af21907fdd
     const customId = nanoid()
     let Images = []
